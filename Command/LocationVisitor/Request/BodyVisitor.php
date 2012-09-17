@@ -1,21 +1,21 @@
 <?php
 
-namespace Guzzle\Service\Command\LocationVisitor;
+namespace Guzzle\Service\Command\LocationVisitor\Request;
 
 use Guzzle\Http\EntityBody;
 use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Service\Description\ApiParam;
 use Guzzle\Service\Command\CommandInterface;
+use Guzzle\Service\Description\Parameter;
 
 /**
  * Visitor used to apply a body to a request
  */
-class BodyVisitor extends AbstractVisitor
+class BodyVisitor extends AbstractRequestVisitor
 {
     /**
      * {@inheritdoc}
      */
-    public function visit(CommandInterface $command, RequestInterface $request, $key, $value, ApiParam $param = null)
+    public function visit(CommandInterface $command, RequestInterface $request, Parameter $param, $value)
     {
         $request->setBody(EntityBody::factory($value));
     }
