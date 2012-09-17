@@ -1,15 +1,15 @@
 <?php
 
-namespace Guzzle\Service\Command\LocationVisitor;
+namespace Guzzle\Service\Command\LocationVisitor\Request;
 
 use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Service\Description\ApiParam;
 use Guzzle\Service\Command\CommandInterface;
+use Guzzle\Service\Description\Parameter;
 
 /**
  * Visitor used to apply a parameter to an array that will be serialized as a top level key-value pair in a JSON body
  */
-class JsonBodyVisitor extends AbstractVisitor
+class JsonBodyVisitor extends AbstractRequestVisitor
 {
     /**
      * @var bool Whether or not to add a Content-Type header when JSON is found
@@ -47,21 +47,13 @@ class JsonBodyVisitor extends AbstractVisitor
     /**
      * {@inheritdoc}
      */
-    public function visit(CommandInterface $command, RequestInterface $request, $key, $value, ApiParam $param = null)
+    public function visit(CommandInterface $command, RequestInterface $request, Parameter $param, $value)
     {
-        if (is_array($value)) {
-            $value = $this->resolveRecursively($value, $param);
-        }
-
-        if (isset($this->data[$command])) {
-            $json = $this->data[$command];
-            $json[$key] = $value;
-            $this->data[$command] = $json;
-        } elseif ($param) {
-            $this->data[$command] = array($key => $value);
-        } else {
-            $this->data[$command] = array($key => $value);
-        }
+        $json = isset($this->data[$command]) ? $this->data[$command] : array();
+        $json[$param->getRename() ?: $param->getName()] = $param && is_array($value)
+            ? $this->resolveRecursively($value, $param)
+            : $value;
+        $this->data[$command] = $json;
     }
 
     /**

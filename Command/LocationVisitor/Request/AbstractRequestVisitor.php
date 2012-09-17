@@ -1,15 +1,15 @@
 <?php
 
-namespace Guzzle\Service\Command\LocationVisitor;
+namespace Guzzle\Service\Command\LocationVisitor\Request;
 
-use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Service\Description\ApiParam;
 use Guzzle\Service\Command\CommandInterface;
+use Guzzle\Http\Message\RequestInterface;
+use Guzzle\Service\Description\Parameter;
 
 /**
- * Default shared behavior for location visitors
+ * {@inheritdoc}
  */
-abstract class AbstractVisitor implements LocationVisitorInterface
+abstract class AbstractRequestVisitor implements RequestVisitorInterface
 {
     /**
      * {@inheritdoc}
@@ -21,21 +21,21 @@ abstract class AbstractVisitor implements LocationVisitorInterface
      * {@inheritdoc}
      * @codeCoverageIgnore
      */
-    public function visit(CommandInterface $command, RequestInterface $request, $key, $value, ApiParam $param = null) {}
+    public function visit(CommandInterface $command, RequestInterface $request, Parameter $param, $value) {}
 
     /**
      * Map nested parameters into the location_key based parameters
      *
-     * @param array    $value Value to map
-     * @param ApiParam $param Parameter that holds information about the current key
+     * @param array     $value Value to map
+     * @param Parameter $param Parameter that holds information about the current key
      *
      * @return array Returns the mapped array
      */
-    protected function resolveRecursively(array $value, ApiParam $param)
+    protected function resolveRecursively(array $value, Parameter $param)
     {
         foreach ($value as $name => $v) {
-            if ($subParam = $param->getStructure($name)) {
-                $key = $subParam->getLocationKey();
+            if ($subParam = $param->getProperty($name)) {
+                $key = $subParam->getRename() ?: $name;
                 if (is_array($v)) {
                     $value[$key] = $this->resolveRecursively($v, $subParam);
                 } elseif ($name != $key) {

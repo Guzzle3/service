@@ -1,26 +1,26 @@
 <?php
 
-namespace Guzzle\Service\Command\LocationVisitor;
+namespace Guzzle\Service\Command\LocationVisitor\Request;
 
 use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Message\PostFileInterface;
-use Guzzle\Service\Description\ApiParam;
 use Guzzle\Service\Command\CommandInterface;
+use Guzzle\Service\Description\Parameter;
 
 /**
  * Visitor used to apply a parameter to a POST file
  */
-class PostFileVisitor extends AbstractVisitor
+class PostFileVisitor extends AbstractRequestVisitor
 {
     /**
      * {@inheritdoc}
      */
-    public function visit(CommandInterface $command, RequestInterface $request, $key, $value, ApiParam $param = null)
+    public function visit(CommandInterface $command, RequestInterface $request, Parameter $param, $value)
     {
         if ($value instanceof PostFileInterface) {
             $request->addPostFile($value);
         } else {
-            $request->addPostFile($key, $value);
+            $request->addPostFile($param->getRename() ?: $param->getName(), $value);
         }
     }
 }
